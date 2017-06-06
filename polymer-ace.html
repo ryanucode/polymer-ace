@@ -1,0 +1,140 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<script type="text/javascript" src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+
+<dom-module id="polymer-ace">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      .ajaxorg-ace {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+      }
+    </style>
+    <div id="container">alert('test [[value]]')</div>
+    <h2>Hello [[value]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `polymer-ace`
+     * Ace editor web component.
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PolymerAce extends Polymer.Element {
+      static get is() { return 'polymer-ace' }
+
+      static get properties() {
+        return {
+          value: {
+            type: String,
+            value: 'polymer-ace',
+            observer: '_valueChanged',
+          },
+          readonly: {
+            type: Boolean,
+            value: false,
+            observer: '_readonlyChanged',
+          },
+          theme: {
+            type: String,
+            value: "",
+            observer: '_themeChanged',
+          },
+          mode: {
+            type: String,
+            value: "ace/mode/plain_text",
+            observer: '_modeChanged'
+          },
+          wrapmode: {
+            type: Boolean,
+            value: true,
+            observer: '_wrapmodeChanged',
+          },
+          fontsize: {
+            type: Number,
+            value: 12,
+            observer: '_fontsizeChanged',
+          },
+          softtabs: {
+            type: Boolean,
+            value: true,
+            observer: '_softtabsChanged',
+          },
+          tabsize: {
+            type: Number,
+            value: 4,
+            observer: '_tabsizeChanged',
+          }
+        }
+      }
+
+      static get observedAttributes() {
+        return ['value', 'readonly', 'theme', 'mode', 'wrapmode', 'fontsize', 'softtabs', 'tabsize']
+      }
+
+      constructor() {
+        super()
+        return this
+      }
+
+      connectedCallback() {
+        super.connectedCallback()
+        this.initializeEditor()
+        this._connected = true
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback()
+        this._connected = false
+      }
+
+      initializeEditor() {
+        this.editor = ace.edit(this.$.container)
+        this._valueChanged()
+        this._readonlyChanged()
+        this._themeChanged()
+        this._modeChanged()
+        this._wrapmodeChanged()
+        this._fontSizeChanged()
+        this._softtabsChanged()
+        this._tabsizeChanged()
+
+        this.$.container.addEventListener('change', this.editorChangeHandler.bind(this))
+        this.$.container.addEventListener('blur', this.editorChangeHandler.bind(this))
+
+        this.dispatchEvent(new CustomEvent('editor-ready', { detail: editor, bubbles: true }))
+      }
+
+      editorChangeHandler(event) {
+        this.value = this.editor.getValue()
+        this.dispatchEvent('change', { bubbles: true })
+      }
+
+      editorBlurHandler(event) {
+        this.dispatchEvent('blur', { bubbles: true })
+      }
+
+      _valueChanged() {
+        this.editor.setValue(this.value)
+      }
+
+
+    }
+
+
+    window.customElements.define(PolymerAce.is, PolymerAce)
+  </script>
+</dom-module>
