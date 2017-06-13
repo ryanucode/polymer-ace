@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
 <script type="text/javascript" src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
 
 <dom-module id="polymer-ace">
@@ -12,7 +12,7 @@
         bottom: 0;
         right: 0;
       }
-      .ajaxorg-ace {
+      .container {
           position: absolute;
           top: 0;
           left: 0;
@@ -50,12 +50,12 @@
           },
           theme: {
             type: String,
-            value: "",
+            value: "github",
             observer: '_themeChanged',
           },
           mode: {
             type: String,
-            value: "ace/mode/plain_text",
+            value: "plain_text",
             observer: '_modeChanged'
           },
           wrapmode: {
@@ -108,14 +108,14 @@
         this._themeChanged()
         this._modeChanged()
         this._wrapmodeChanged()
-        this._fontSizeChanged()
+        this._fontsizeChanged()
         this._softtabsChanged()
         this._tabsizeChanged()
 
         this.$.container.addEventListener('change', this.editorChangeHandler.bind(this))
         this.$.container.addEventListener('blur', this.editorChangeHandler.bind(this))
 
-        this.dispatchEvent(new CustomEvent('editor-ready', { detail: editor, bubbles: true }))
+        this.dispatchEvent(new CustomEvent('editor-ready', { detail: this.editor, bubbles: true }))
       }
 
       editorChangeHandler(event) {
@@ -128,9 +128,47 @@
       }
 
       _valueChanged() {
-        this.editor.setValue(this.value)
+        if (this.editor)
+          this.editor.setValue(this.value)
       }
 
+      _readonlyChanged() {
+        if (this.editor) {
+          this.editor.setReadOnly(this.readonly)
+          this.editor.setHighlightActiveLine(!this.readonly)
+          this.editor.setHighlightGutterLine(!this.readonly)
+        }
+      }
+
+      _themeChanged() {
+        if (this.editor)
+          this.editor.setTheme('ace/theme/' + this.theme)
+      }
+
+      _modeChanged() {
+        if (this.editor)
+          this.editor.getSession().setMode('ace/mode/' + this.mode)
+      }
+
+      _wrapmodeChanged() {
+        if (this.editor)
+          this.editor.getSession().setUseWrapMode(this.wrapmode)
+      }
+
+      _fontsizeChanged() {
+        if (this.editor)
+          this.editor.setFontSize(this.fontsize)
+      }
+
+      _softtabsChanged() {
+        if (this.editor)
+          this.editor.getSession().setUseSoftTabs(this.softtabs)
+      }
+
+      _tabsizeChanged() {
+        if (this.editor)
+          this.editor.getSession().setTabSize(this.tabsize)
+      }
 
     }
 
